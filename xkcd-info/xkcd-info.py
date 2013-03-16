@@ -19,7 +19,7 @@ class Comic():
 		self.alls = opts['all']
 		self.explanation = opts['explanation']
 		self.mouseover = opts['mouseover']
-		self.basic = opts['basic']
+		self.basic = opts['nobasic']
 		self.transcript = opts['transcript']
 
 
@@ -90,20 +90,31 @@ class Comic():
 		try:
 			raw_explanation = urllib.urlopen('http://www.explainxkcd.com/wiki/index.php?title='+self.comic).read().split('\n')
 			
+			print raw_explanation
+			print '\n\n\nV2'
+			
+			for line in raw_explanation:
+				line = line.encode('ascii','replace')
+				
+			
 			variable = self.getnumber()+':_'+'_'.join(self.gettitle().split(' '))
 			start = '<h2><span class="editsection">[<a href="/wiki/index.php?title='+variable+'&amp;action=edit&amp;section=1" title="Edit section: Explanation">edit</a>]</span> <span class="mw-headline" id="Explanation">Explanation</span></h2>'
 			end = '<h2><span class="editsection">[<a href="/wiki/index.php?title='+variable+'&amp;action=edit&amp;section=2" title="Edit section: Transcript">edit</a>]</span> <span class="mw-headline" id="Transcript">Transcript</span></h2>'
 			
-			start_index = raw_explanation.index(start)
-			end_index = raw_explanation.index(start)
+			print raw_explanation
+			
+			start_index = raw_explanation.index(start.decode('utf-8'))
+			end_index = raw_explanation.index(start.decode('utf-8'))
 			
 			e_explanation = raw_explanation[start_index:end_index]
+			
+			print e_explanation
 			
 			explanation = '\n'.join(e_explanation)
 			
 		except:
 			explanation = 'There\'s no explanation for this comic.'
-		
+
 		return explanation
 			
 	def __str__(self):		
@@ -134,22 +145,22 @@ class Comic():
 		info = '\n'.join(i)+'\n'
 		return info
 		
-if __name__ == '__main__':
+def main():
 	arguments = sys.argv
 	
 	parser = OptionParser(usage='Usage: %prog [options]',
 						  version='%prog 0.1')
 	parser.add_option('-c', '--comic', action='store', dest="comic_number",
 					  help='The comic number of the comic you want to get info about.')
-	parser.add_option('-a', '--all', action='store_false', default=False,
+	parser.add_option('-a', '--all', action='store_true', default=False,
 					  help='Show all the information.')	
-	parser.add_option('-b', '--basic', action='store_true', default=True,
-					  help='Show just the basic information.')
-	parser.add_option('-m', '--mouseover', action='store_false', default=False,
+	parser.add_option('-n', '--nobasic', action='store_false', default=True,
+					  help='Do not show the basic information.')
+	parser.add_option('-m', '--mouseover', action='store_true', default=False,
 					  help='Show the mouseover text of the comic.')
-	parser.add_option('-e', '--explanation', action='store_false', default=False,
+	parser.add_option('-e', '--explanation', action='store_true', default=False,
 					  help='Show the explanation of the comic.')
-	parser.add_option('-t', '--transcript', action='store_false', default=False,
+	parser.add_option('-t', '--transcript', action='store_true', default=False,
 					  help='Show the transcript of the comic.')
 
 
@@ -165,3 +176,5 @@ if __name__ == '__main__':
 
 	print comic
 	
+if __name__ == '__main__':
+	main()
