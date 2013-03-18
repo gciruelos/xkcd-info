@@ -11,7 +11,52 @@
 import urllib
 import json
 import sys
+import re
 from optparse import OptionParser
+
+class Link():
+	def __init__(self, line):
+		#Example: <a href="/wiki/index.php?title=Megan" title="Megan">Megan</a>
+		self.links = 0
+		self.line = line
+
+class Explanation():
+	def __init__(self, comic):
+			self.raw_explanation = urllib.urlopen('http://www.explainxkcd.com/wiki/index.php?title='+comic).read().split('\n')
+			
+			for line in self.raw_explanation:
+				if 'id="Explanation"' in line:
+					start = self.raw_explanation.index(line)
+				elif 'id="Transcript"' in line:
+					end = self.raw_explanation.index(line)
+			try:
+				self.less_raw_explanation = self.raw_explanation[start+1:end-1]
+			except:
+				self.less_raw_explanation = ''
+	
+	def clean(self):
+		if self.less_raw_explanation == '':
+			return 'This comic has no explanation available.'
+	
+		cleaned0 = []
+		for line in self.less_raw_explanation:
+			cleaned0.append(str(line))
+
+		findings = []											#cleans paragraphs and italics tags
+		for line in cleaned0:
+			findings = findings + re.findall('</?[pi]>', line)
+		findings = set(findings)
+		for expression in findings:
+			for line in cleaned0:
+				i = cleaned0.index(line)
+				cleaned0[i] = line.replace(expression, '')
+				
+		cleaned1 = cleaned0
+		
+		explanation = '\n'.join(cleaned1)
+		
+		return explanation		
+
 
 class Comic():
 	def __init__(self, opts):
@@ -35,7 +80,11 @@ class Comic():
 			self.raw_information = urllib.urlopen('http://xkcd.com/'+comicn+'info.0.json').read()
 			self.information = json.loads(self.raw_information)
 		except:
-			print 'The comic you tried to get information about doesn\'t exist yet.'
+			try:
+				int(opts['comic_number'])
+				print 'The comic you tried to get information about doesn\'t exist yet.'
+			except:
+				print 'The comic number you entered is not a number or is invalid.'
 			exit()
 
 	def print_raw_info(self):
@@ -87,33 +136,7 @@ class Comic():
 		return text
 	
 	def getexplanation(self):
-		try:
-			raw_explanation = urllib.urlopen('http://www.explainxkcd.com/wiki/index.php?title='+self.comic).read().split('\n')
-			
-			print raw_explanation
-			print '\n\n\nV2'
-			
-			for line in raw_explanation:
-				line = line.encode('ascii','replace')
-				
-			
-			variable = self.getnumber()+':_'+'_'.join(self.gettitle().split(' '))
-			start = '<h2><span class="editsection">[<a href="/wiki/index.php?title='+variable+'&amp;action=edit&amp;section=1" title="Edit section: Explanation">edit</a>]</span> <span class="mw-headline" id="Explanation">Explanation</span></h2>'
-			end = '<h2><span class="editsection">[<a href="/wiki/index.php?title='+variable+'&amp;action=edit&amp;section=2" title="Edit section: Transcript">edit</a>]</span> <span class="mw-headline" id="Transcript">Transcript</span></h2>'
-			
-			print raw_explanation
-			
-			start_index = raw_explanation.index(start.decode('utf-8'))
-			end_index = raw_explanation.index(start.decode('utf-8'))
-			
-			e_explanation = raw_explanation[start_index:end_index]
-			
-			print e_explanation
-			
-			explanation = '\n'.join(e_explanation)
-			
-		except:
-			explanation = 'There\'s no explanation for this comic.'
+		explanation = Explanation(self.comic).clean()
 
 		return explanation
 			
@@ -141,9 +164,13 @@ class Comic():
 			i.append('\n'+'Mouseover text:\n'+self.getmouseovertext())
 			i.append('\n'+'Explanation:\n'+self.getexplanation())		
 
-
-		info = '\n'.join(i)+'\n'
+		try:
+			info = '\n'.join(i)+'\n'
+		except:
+			print 'FATAL ERROR'
+			exit()
 		return info
+
 		
 def main():
 	arguments = sys.argv
@@ -175,6 +202,7 @@ def main():
 	comic = Comic(options)
 
 	print comic
+
 	
 if __name__ == '__main__':
 	main()
