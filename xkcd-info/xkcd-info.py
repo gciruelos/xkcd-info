@@ -63,14 +63,18 @@ class Explanation():
 		
 		#http://www.w3schools.com/tags/tag_a.asp
 		link_regex = '<a.+?</a>'
-		for line in cleaned0:
-			i = cleaned0.index(line)
-			if re.findall(link_regex, line) == []:
-				cleaned0[i] = line
-			else:
-				for link in re.findall(link_regex, line):
-					print link
-					cleaned0[i] = line.replace(link, str(Link(link)))
+		paragraphs = len(cleaned0)
+		counter = 0
+		while counter<paragraphs:
+			for line in cleaned0:
+				i = cleaned0.index(line)
+				if re.findall(link_regex, line) == []:
+					cleaned0[i] = line
+					counter += 1
+				else:
+					for link in re.findall(link_regex, line):
+						print link
+						cleaned0[i] = line.replace(link, str(Link(link)))
 	
 		cleaned1 = cleaned0
 		
