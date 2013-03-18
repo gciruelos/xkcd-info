@@ -15,10 +15,20 @@ import re
 from optparse import OptionParser
 
 class Link():
-	def __init__(self, line):
+	def __init__(self, link):
 		#Example: <a href="/wiki/index.php?title=Megan" title="Megan">Megan</a>
-		self.links = 0
-		self.line = line
+		self.link_regex = 'href=".+?"'
+		self.word_regex = '>.+?<'
+		self.link = str(link)
+	def __str__(self):
+		link = re.findall(self.link_regex, self.link)[0][6:-1]
+		word = re.findall(self.word_regex, self.link)[0][1:-1]
+		
+		if link[0:16] == '/wiki/index.php?':
+			link = 'http://www.explainxkcd.com'+link
+		
+		print word+' ['+link+']'
+		return word+' ['+link+']'
 
 class Explanation():
 	def __init__(self, comic):
@@ -50,7 +60,18 @@ class Explanation():
 			for line in cleaned0:
 				i = cleaned0.index(line)
 				cleaned0[i] = line.replace(expression, '')
-				
+		
+		#http://www.w3schools.com/tags/tag_a.asp
+		link_regex = '<a.+?</a>'
+		for line in cleaned0:
+			i = cleaned0.index(line)
+			if re.findall(link_regex, line) == []:
+				cleaned0[i] = line
+			else:
+				for link in re.findall(link_regex, line):
+					print link
+					cleaned0[i] = line.replace(link, str(Link(link)))
+	
 		cleaned1 = cleaned0
 		
 		explanation = '\n'.join(cleaned1)
