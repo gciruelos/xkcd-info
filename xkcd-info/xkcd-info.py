@@ -4,9 +4,14 @@
 # This script can be used as a stand-alone program or as a module for a
 # bigger script
 #
+# Explanations from http://www.explainxkcd.com/, all under CC-BY-SA-3.0 license
+# Comics under CC-BY-NC-2.5, all rights 
+#
 # 
 # Author: Gonzalo Ciruelos <comp.gonzalo@gmail.com>
 # License: GPLv3
+
+
 
 import urllib
 import json
