@@ -128,7 +128,7 @@ def main():
 	# Looks for the string that's going to search.
 	if options['string'] == None:
 		#print('At least one word argument required.\nUse --help to show usage.')
-		string = input('[search]> ')
+		string = str(input('[search]> '))
 	else:
 		string = options['string']
 	
