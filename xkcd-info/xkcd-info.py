@@ -1,15 +1,17 @@
-## xkcd-info - A simple and fast script to retrieve info about an specific xkcd comic
-# Version 0.1
-#
-# This script can be used as a stand-alone program or as a module for a
-# bigger script
-#
-# Explanations from http://www.explainxkcd.com/, all under CC-BY-SA-3.0 license
-# Comics under CC-BY-NC-2.5, all rights 
-#
-# 
-# Author: Gonzalo Ciruelos <comp.gonzalo@gmail.com>
-# License: GPLv3
+'''
+xkcd-info - A simple and fast script to retrieve info about an specific xkcd comic
+Version 0.1
+
+This script can be used as a stand-alone program or as a module for a
+bigger script
+
+Explanations from http://www.explainxkcd.com/, all under CC-BY-SA-3.0 license
+Comics under CC-BY-NC-2.5, all rights 
+
+ 
+Author: Gonzalo Ciruelos <comp.gonzalo@gmail.com>
+License: GPLv3
+'''
 
 
 
@@ -97,14 +99,14 @@ class Comic():
 		self.basic = opts['nobasic']
 		self.transcript = opts['transcript']
 
-
+		
 		if opts['comic_number'] in ('last', 'current', '0'):
 			comicn = ''
 		else:
 			if opts['comic_number'] == '420':
 				print 'Blaze it faggot'
 			comicn = opts['comic_number']+'/'
-			
+
 		try:
 			self.comic = opts['comic_number']
 			self.raw_information = urllib.urlopen('http://xkcd.com/'+comicn+'info.0.json').read()

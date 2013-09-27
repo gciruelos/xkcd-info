@@ -8,84 +8,13 @@ Author: Gonzalo Ciruelos <comp.gonzalo@gmail.com>
 License: GPLv3
 '''
 
-
-
-import urllib.request, urllib.parse, urllib.error
+import urllib
 import json
 import sys
 import re
 import time
 from optparse import OptionParser
-
-class Comic():
-	def __init__(self, comicn):
-		try:
-			self.comic = comicn
-			self.raw_information = urllib.request.urlopen('http://xkcd.com/'+str(comicn)+'/info.0.json').read().decode('utf-8')
-			self.information = json.loads(self.raw_information)
-		except (KeyboardInterrupt, SystemExit):
-			print('\n')
-			exit()
-		except:
-			print('CRITICAL ERROR WITH COMIC:', comicn)
-
-	def print_raw_info(self):
-		print(self.information)
-
-	def getnumber(self):
-		number = self.comic
-		
-		return str(number)
-	
-	def gettitle(self):
-		title = self.information['safe_title']
-		return title
-
-	def getdate(self):
-		months = ['null', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-		
-		day = self.information['day']
-		month = months[int(self.information['month'])]
-		year = self.information['year']
-		
-		if day[-1] == '3':
-			suffix = 'rd'
-		elif day[-1] == '2':
-			suffix = 'nd'
-		elif day[-1] == '1':
-			suffix = 'st'
-		else:
-			suffix = 'th'
-		day = day+suffix
-		
-		return day+' '+month+' '+year
-
-	def getlink(self):
-		link = 'http://xkcd.com/'+str(self.comic)+'/'
-		return link
-
-	def gettranscript(self):
-		raw_transcript = self.information['transcript']
-		listoflines = raw_transcript.split('\n')
-		
-		transcript = '\n'.join(listoflines[:-2])		
-		
-		return transcript
-
-	def getmouseovertext(self):
-		text = self.information['alt']
-		return text
-
-	def __str__(self):		
-		i = ['\n']
-
-		i.append('Number: '+self.getnumber())
-		i.append('Title: '+self.gettitle())
-		i.append('Date: '+self.getdate())
-		i.append('Link: '+self.getlink())	
-
-		info = '\n'.join(i)+'\n'
-		return info
+xkcd = __import__('xkcd-info')
 
 
 def update_progress(progress):
@@ -127,8 +56,7 @@ def main():
 
 	# Looks for the string that's going to search.
 	if options['string'] == None:
-		#print('At least one word argument required.\nUse --help to show usage.')
-		string = str(input('[search]> '))
+		string = raw_input('[search]> ')
 	else:
 		string = options['string']
 	
@@ -143,11 +71,11 @@ def main():
 	
 	
 	# Looks for the comics it's going to look between.
-	comicno = options['comicno']
 	try:
+		comicno = options['comicno']
 		if comicno[-1]=='-':
 			mincomic = int(comicno[:-1])
-			maxcomic = 1216
+			maxcomic = 400
 		elif comicno[0]=='-':
 			mincomic = 1
 			maxcomic = int(comicno[1:])
@@ -155,12 +83,15 @@ def main():
 			mincomic = int(comicno.split('-')[0])
 			maxcomic = int(comicno.split('-')[1])
 		else:
-			print("\nThere was an error with the comic number bounds, the default values have been asigned.")
+			print "\nThere was an error with the comic number bounds, please choose them again."
 			raise ZeroDivisionError
 	except:
-		mincomic = 1
-		maxcomic = 1216
-	#@@@print(words, mincomic, maxcomic)
+		try:
+			mincomic = int(raw_input('[mincomic]> '))
+			maxcomic = int(raw_input('[maxcomic]> '))
+		except:
+			print "\nThere was an error with the comic number bounds."
+			exit()
 
 
 	# The actual search
@@ -173,16 +104,21 @@ def main():
 		results = 0
 		for word in words:
 			try:
-				comic = Comic(comic_number)
-				if comic.gettitle().lower().find(word)==-1 and comic.gettranscript().lower().find(word)==-1 and comic.getmouseovertext().lower().find(word)==-1:
-					pass
-				else:
-					results += 1
+				comic = xkcd.Comic({'all': False,
+									'explanation': False,
+									'comic_number': str(comic_number),
+									'mouseover': False,
+									'transcript': False,
+									'nobasic': True})
+				texts = [comic.gettitle().lower(), comic.gettranscript().lower(),comic.getmouseovertext().lower()]
+				for text in texts:
+					if text.find(word)!=-1:
+						results += 1
 			except (KeyboardInterrupt, SystemExit):
-				print('\n')
+				print '\n'
 				exit()
 			except:
-				print("ERROR WITH COMIC:", comic_number)
+				print "ERROR WITH COMIC:", comic_number 
 				continue
 		
 		if results:
@@ -197,12 +133,17 @@ def main():
 	#@@@print ('\n\n'+str(findings))
 	
 	if len(findings)==0:
-		print('\n\nNO RESULTS FOUND\n\n')
+		print '\n\nNO RESULTS FOUND\n\n'
 	else:
-		print('\n\nSearch results:', len(findings), 'in %.3f seconds' % (time.time()-t0))
+		print '\n\nSearch results:', len(findings), 'in %.3f seconds' % (time.time()-t0)
 		
 		for finding in findings:
-			print(Comic(finding[0]))
+			print xkcd.Comic({'all': False,
+						 'explanation': False,
+			 			 'comic_number': str(finding[0]),
+						 'mouseover': False,
+						 'transcript': False,
+						 'nobasic': True})
 	
 	
 if __name__ == '__main__':
