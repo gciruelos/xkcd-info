@@ -61,7 +61,7 @@ class Comic():
 		return day+' '+month+' '+year
 
 	def getlink(self):
-		link = 'http://xkcd.com/'+str(self.comic)+'/')
+		link = 'http://xkcd.com/'+str(self.comic)+'/'
 		return link
 
 	def gettranscript(self):
@@ -127,8 +127,8 @@ def main():
 
 	# Looks for the string that's going to search.
 	if options['string'] == None:
-		print('At least one word argument required.\nUse --help to show usage.')
-		exit()
+		#print('At least one word argument required.\nUse --help to show usage.')
+		string = input('[search]> ')
 	else:
 		string = options['string']
 	
