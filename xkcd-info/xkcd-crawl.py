@@ -4,7 +4,7 @@ xkcd-crawl - Looks up for words in xkcd comics.
 Use with prudence, because it makes lots of requests to xkcd.com
 
 
-Author: Gonzalo Ciruelos <comp.gonzalo@gmail.com>
+Author: Gonzalo Ciruelos <gonzalo.ciruelos@gmail.com>
 License: GPLv3
 '''
 

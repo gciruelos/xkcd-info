@@ -9,7 +9,7 @@ Explanations from http://www.explainxkcd.com/, all under CC-BY-SA-3.0 license
 Comics under CC-BY-NC-2.5, all rights 
 
  
-Author: Gonzalo Ciruelos <comp.gonzalo@gmail.com>
+Author: Gonzalo Ciruelos <gonzalo.ciruelos@gmail.com>
 License: GPLv3
 '''
 
